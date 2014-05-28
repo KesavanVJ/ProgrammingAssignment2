@@ -1,27 +1,54 @@
-## Put comments here that give an overall description of what your
-## functions do
+## Matrix inversion can be a very costly operation and these functions listed
+## below enable to create a matrix whose inverse can be cached and retrieved 
+## quickly. 
 
-## Write a short comment describing this function
-
-makeCacheMatrix <- function(x = matrix()) {
-
-    m <- NULL
-    set <- function(y) {
-        x <<- y
-        m <<- NULL
-    }
-    get <- function() x
-    setmean <- function(mean) m <<- mean
-    getmean <- function() m
-    list(set = set, get = get,
-         setmean = setmean,
-         getmean = getmean)
+## Make CacheMatrix - Set, Retreive Matrix and it's (cached) Inverse
+makeCacheMatrix <- function(cMatrix = matrix()) {
     
+    # Initialize Inverse of Matrix (to be cached)
+    InvcMatrix <- NULL
+    
+    # set Matrix function
+    setMatrix <- function(newMatrix) {  
+            # Set or Update cMatrix 
+            cMatrix <<- newMatrix
+            # Reset Inverse Matrix to Null
+            InvcMatrix <<- NULL   
+    }
+    
+    # get Matrix function
+    getMatrix <- function() cMatrix
+    
+    # set Matrix Inverse
+    setInverse <- function(newinvMatrix) InvcMatrix <<- newinvMatrix
+    
+    # get Matrix Inverse
+    getInverse <- function() InvcMatrix
+    
+    # Returns the list of setMatrix, getMatrix,
+    # setInverse & getInverse functions
+    list(setMatrix = setMatrix,
+         getMatrix = getMatrix,
+         setInverse = setInverse,
+         getInverse = getInverse) 
 }
 
-
-## Write a short comment describing this function
-
-cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+## Return the inverse of matrix created using makeCacheMatrix from Cache
+## if not available, the inverse is calculated using solve() 
+cacheSolve <- function(cacheMatrix, ...) {
+    
+    # Get Cached Inverse Matrix
+    invMatrix <- cacheMatrix$getInverse()
+    
+    # if Inverse of Matrix cached - invMatrix is not null
+    if(!is.null(invMatrix)) {
+        message("getting cached data")
+        return(invMatrix)
+    } else { # Cache empty - calculate Inverse of Matrix
+        message("calculating Inverse of Matrix")
+        cMatrix <- cacheMatrix$getMatrix()
+        invMatrix <- solve(cMatrix)
+        cacheMatrix$setInverse(invMatrix)
+        return(invMatrix)
+    }
 }
